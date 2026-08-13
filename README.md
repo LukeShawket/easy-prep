@@ -2,7 +2,7 @@
 
 #  easy-prep
 
-> **A universal, intuitive data preparation solution built for workplace productivity.**
+ **A universal, intuitive data preparation solution built for workplace productivity.**
 
 [![Python Version](https://img.shields.io/badge/Python-3.9%2B-blue.svg)](https://www.python.org/)
 [![UI Framework](https://img.shields.io/badge/UI-ttkbootstrap-107C41.svg)](https://ttkbootstrap.readthedocs.io/)
@@ -10,7 +10,6 @@
 [![Status](https://img.shields.io/badge/Status-Work%20in%20Progress-orange.svg)]()
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 
----
 </div>
 
 **easy-prep** is a lightweight desktop application designed to streamline repetitive data cleaning, transformation, and previewing tasks without requiring users to manually copy pasting on Excel or writing complex scripts.
