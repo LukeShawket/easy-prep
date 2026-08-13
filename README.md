@@ -39,8 +39,8 @@ Architect for modularity: seamlessly integrate your own custom Python functions 
 -  **High-Performance Core:** Powered by `Pandas` for fast in-memory tabular processing.
 -  **Interactive Data Dashboard:** Instant dataset visualization, column profiling, and summary analytics.
 -  **Workplace-Focused:** Designed to bridge the gap between raw data dumps and decision-ready analysis.
--  **Easy to use for non-technical and technical users.
--  **Built for scaling, easy to add functions add customize it as needed.
+-  **Easy to Use:** Technical and non-technical users can easily pickup and manipulating data.
+-  **Built for Scaling:** Easy to add functions add customize as needed.
 
    
 ##  Built With
