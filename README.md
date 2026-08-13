@@ -1,3 +1,5 @@
+<div align="center">
+
 #  easy-prep
 
 > **A universal, intuitive data preparation solution built for workplace productivity.**
@@ -6,13 +8,14 @@
 [![UI Framework](https://img.shields.io/badge/UI-ttkbootstrap-107C41.svg)](https://ttkbootstrap.readthedocs.io/)
 [![Data Engine](https://img.shields.io/badge/Data-Pandas-150458.svg)](https://pandas.pydata.org/)
 [![Status](https://img.shields.io/badge/Status-Work%20in%20Progress-orange.svg)]()
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 
 ---
+</div>
 
 **easy-prep** is a lightweight desktop application designed to streamline repetitive data cleaning, transformation, and previewing tasks without requiring users to manually copy pasting on Excel or writing complex scripts.
 
-Architected for modularity: seamlessly integrate your own custom Python functions and tailor the tool to your workplace needs.
+Architect for modularity: seamlessly integrate your own custom Python functions and tailor the tool to your workplace needs.
 
 ---
 
