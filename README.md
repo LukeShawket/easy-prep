@@ -14,7 +14,7 @@
 
 **Easy Prep** is a lightweight desktop application designed to streamline repetitive data cleaning, transformation, and previewing tasks without requiring users to manually copy pasting on Excel or writing complex scripts.
 
-Architect for modularity: seamlessly integrate your own custom Python functions and tailor the tool to your workplace needs.
+Architected for modularity: seamlessly integrate your own custom Python functions and tailor the tool to your workplace needs.
 
 
 ##  Interface Preview
