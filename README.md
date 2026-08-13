@@ -16,7 +16,6 @@
 
 Architect for modularity: seamlessly integrate your own custom Python functions and tailor the tool to your workplace needs.
 
----
 
 ##  Interface Preview
 
@@ -32,7 +31,6 @@ Architect for modularity: seamlessly integrate your own custom Python functions 
 
 </div>
 
----
 
 ##  Key Features
 
@@ -44,9 +42,10 @@ Architect for modularity: seamlessly integrate your own custom Python functions 
 -  **Easy to use for non-technical and technical users.
 -  **Built for scaling, easy to add functions add customize it as needed.
 
----
-
+   
 ##  Built With
+
+<div align="center">
 
 | Component | Technology | Description |
 | :--- | :--- | :--- |
@@ -54,7 +53,7 @@ Architect for modularity: seamlessly integrate your own custom Python functions 
 | **Interface** | ![ttkbootstrap](https://img.shields.io/badge/ttkbootstrap-107C41?style=flat) | Modern themed Tkinter wrapper |
 | **Data Engine** | ![Pandas](https://img.shields.io/badge/Pandas-150458?style=flat&logo=pandas&logoColor=white) | Fast tabular data manipulation |
 
----
+</div>
 
 ##  Getting Started
 
@@ -66,5 +65,5 @@ Make sure you have **Python 3.9+** installed on your system.
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/LukeShawket/easy-prep.git](https://github.com/LukeShawket/easy-prep.git)
+   git clone https://github.com/LukeShawket/easy-prep.git
    cd easy-prep
