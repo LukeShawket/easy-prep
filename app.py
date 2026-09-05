@@ -18,7 +18,7 @@ class App():
         self.app = ttk.Window(title="Easy Prep",themename="darkly",size=(1200, 800))
         self.reset_callback = reset_callback
         self.ctrl_view = c_view.ContrllerView(app=self.app)
-        self.ctrl_app = c_app.ToolController()
+        self.ctrl_app = c_app.AppController()
         self.parser = ps.Parser()
         self.data = None
         self.apps = []

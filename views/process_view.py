@@ -9,6 +9,9 @@ class ProcessView:
 
         self.app_frame = None
         self.current_columns = None
+        self.input_schema = None
+        self.gui_index = 0
+        self.form_card = None
 
 
     def process_panel(self, frame, title, fields, scrl, cls, funcs):
@@ -26,6 +29,7 @@ class ProcessView:
         self.app_frame.configure(text=title)
 
         self.current_columns = cls
+        self.input_schema = fields
 
         # Toolbar
         toolbar = ttk.Frame(self.app_frame)
@@ -42,19 +46,37 @@ class ProcessView:
         form_frame = scrl_area.scrollable_frame
 
         # Optional "card" container
-        form_card = ttk.Labelframe(form_frame,text="Input Details",bootstyle="info",padding=15)
-        form_card.pack(fill=X, padx=10, pady=10)
+        self.form_card = ttk.Labelframe(form_frame,text="Input Details",bootstyle="info",padding=15)
+        self.form_card.pack(fill=X, padx=10, pady=10)
+
+
+        self.gui_index += 1
+        widget, var = self.render_fields()
+
+        return widget, var
+
+
+
+
+    def render_fields(self, wipe=None):
 
         field_var = {}
-    
+            
         # Dynamic Fields
-        for field in fields:
+        for field in self.input_schema:
+
+            if int(field.get("state", 1)) != self.gui_index:
+                continue
+
+            if wipe:
+                for child in self.form_card.winfo_children():
+                    print(child.cget("text"))
 
             field_name = field["name"]
             field_type = field["type"]
             field_content = field["content"]
 
-            row = ttk.Frame(form_card)
+            row = ttk.Frame(self.form_card)
             row.pack(fill=X, pady=6)
 
             ttk.Label(row,text=field_name,width=20).pack(side=LEFT, padx=(0, 10))
@@ -67,6 +89,7 @@ class ProcessView:
 
             elif field_type == "check":
                 widget, var = self.load_check_field(row=row)
+                widget.configure(command=lambda v= var, f=field: self.check_btn_update(var=v, fld=f))
 
             elif field_type == "mst":
                 if field_content == "columns":
@@ -84,6 +107,23 @@ class ProcessView:
             
 
         return widget, field_var
+
+
+
+    def check_btn_update(self, var, fld):
+        for field in self.input_schema:
+            if field["state"] > self.gui_index:
+                self.gui_index += 1
+
+                if fld["id"] == field["parent_id"]:
+                    if self.gui_index == field["state"] and var.get() == field["depend_value"]:
+                        self.render_fields(wipe=None)
+                    else:
+                        print("working")
+                        self.gui_index -= 1
+                        self.render_fields(wipe=field["name"])
+                else:
+                    pass
 
                 
 

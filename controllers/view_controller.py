@@ -156,4 +156,6 @@ class ContrllerView:
         for app in self.apps:
             if app.b_name == self.current_app_name:
                 for key, value in self.vars.items():
-                    pass
+                    for item in app.input_items:
+                        if item["name"] == key:
+                            item["return"] = value.get()

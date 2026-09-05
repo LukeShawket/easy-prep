@@ -1,7 +1,7 @@
 import os
 import importlib
 
-class ToolController:
+class AppController:
 
     def __init__(self):
 
