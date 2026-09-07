@@ -10,6 +10,8 @@ class Seperater:
         self.input_items = [
                             {
                                 "id": 1,
+                                "parent_id": None,
+                                "depend_value": None,
                                 "state": 1,
                                 "name": "Select a Delimiter",
                                 "type": "combo",
@@ -18,6 +20,8 @@ class Seperater:
                             },
                             {
                                 "id": 2,
+                                "parent_id": None,
+                                "depend_value": None,
                                 "state": 1,
                                 "name": "Add Columns",
                                 "type": "check",

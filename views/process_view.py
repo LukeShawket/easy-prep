@@ -16,6 +16,8 @@ class ProcessView:
 
     def process_panel(self, frame, title, fields, scrl, cls, funcs):
 
+        self.gui_index = 0
+
         if frame:
             for child in frame.winfo_children():
                 child.destroy()
@@ -58,7 +60,7 @@ class ProcessView:
 
 
 
-    def render_fields(self, wipe=None):
+    def render_fields(self):
 
         field_var = {}
             
@@ -66,11 +68,8 @@ class ProcessView:
         for field in self.input_schema:
 
             if int(field.get("state", 1)) != self.gui_index:
-                continue
 
-            if wipe:
-                for child in self.form_card.winfo_children():
-                    print(child.cget("text"))
+                continue
 
             field_name = field["name"]
             field_type = field["type"]
@@ -82,22 +81,22 @@ class ProcessView:
             ttk.Label(row,text=field_name,width=20).pack(side=LEFT, padx=(0, 10))
 
             if field_type == "entry":
-                widget, var = self.load_entry_field(row=row)
+                widget, var = self.load_entry_field(row=row, id=field["id"])
 
             elif field_type == "combo":
-                widget, var = self.load_combo_field(row=row,value=field["content"])
+                widget, var = self.load_combo_field(row=row,value=field["content"], id=field["id"])
 
             elif field_type == "check":
-                widget, var = self.load_check_field(row=row)
+                widget, var = self.load_check_field(row=row, id=field["id"])
                 widget.configure(command=lambda v= var, f=field: self.check_btn_update(var=v, fld=f))
 
             elif field_type == "mst":
                 if field_content == "columns":
-                    widget, var = self.load_mst(row=row, items=self.current_columns)
+                    widget, var = self.load_mst(row=row, items=self.current_columns, id=field["id"])
 
             elif field_type == "sst":
                 if field_content == "columns":
-                    widget, var = self.load_sst(row=row, items=self.current_columns)
+                    widget, var = self.load_sst(row=row, items=self.current_columns, id=field["id"])
 
             else:
                     continue
@@ -112,41 +111,42 @@ class ProcessView:
 
     def check_btn_update(self, var, fld):
         for field in self.input_schema:
-            if field["state"] > self.gui_index:
-                self.gui_index += 1
-
-                if fld["id"] == field["parent_id"]:
+            if field["parent_id"]:
+                if field["parent_id"] == fld["id"]:
+                    self.gui_index += 1
                     if self.gui_index == field["state"] and var.get() == field["depend_value"]:
-                        self.render_fields(wipe=None)
+                        self.render_fields()
                     else:
-                        print("working")
                         self.gui_index -= 1
-                        self.render_fields(wipe=field["name"])
+                        self.render_fields()
                 else:
                     pass
 
                 
 
 
-    def load_entry_field(self, row):
+    def load_entry_field(self, row, id=None):
         var = tk.StringVar()
         widget = ttk.Entry(row,textvariable=var)
+        widget.winfo_name = id
 
         return widget, var
 
-    def load_combo_field(self, row, value):
+    def load_combo_field(self, row, value, id=None):
         var = tk.StringVar()
         widget = ttk.Combobox(row,textvariable=var,values=value,state="readonly")
+        widget.winfo_name = id
 
         return widget, var
 
-    def load_check_field(self, row):
+    def load_check_field(self, row, id=None):
         var = tk.BooleanVar()
         widget = ttk.Checkbutton(row,variable=var,bootstyle="round-toggle")
+        widget.winfo_name = id
 
         return widget, var
 
-    def load_mst(self, row, items=None):
+    def load_mst(self, row, items=None, id=None):
         var = {}
         widget = ttk.Frame(row)
         canvas = tk.Canvas(widget, height=35, highlightthickness=0, bg=ttk.Style().colors.bg)
@@ -168,11 +168,12 @@ class ProcessView:
             bootstyle="toolbutton").pack(side="left", padx=4)
 
         widget.selection_vars = var
+        widget.winfo_name = id
 
         return widget, var
 
 
-    def load_sst(self, row, items=None):
+    def load_sst(self, row, items=None, id=None):
         var = {}
         widget = ttk.Frame(row)
         canvas = tk.Canvas(widget, height=35, highlightthickness=0, bg=ttk.Style().colors.bg)
@@ -193,5 +194,6 @@ class ProcessView:
             variable=var[item],
             bootstyle="toolbutton").pack(side="left", padx=4)
 
+        widget.winfo_name = id
         return widget, var
 

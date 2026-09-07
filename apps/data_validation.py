@@ -9,15 +9,43 @@ class Validater:
 
         self.input_items = [
                             {
-                                "name": "Select A Column",
-                                "type": "sst", # single select tab
-                                "content": "columns",
+                                "id": 1,
+                                "state": 1,
+                                "name": "Select a Delimiter",
+                                "type": "combo",
+                                "content": [",", "|", "\t", ";",":", "^", "%", "@"],
                                 "return": ""
                             },
                             {
-                                "name": "Select Columns",
-                                "type": "mst", # single select tab
+                                "id": 2,
+                                "state": 1,
+                                "name": "Add Columns",
+                                "type": "check",
+                                "content": "continue",
+                                "return": False
+                            },
+                            {
+                                "id": 3,
+                                "parent_id": 2,
+                                "depend_value": True,
+                                "state": 2,
+                                "name": "Add Columns",
+                                "type": "mst",
                                 "content": "columns",
-                                "return": ""
+                                "result": ""
                             }
+
         ]
+
+        self.next_input_items = []
+
+        self.delimiter = None
+    
+    
+    
+        
+    def on_start(self):
+            self.delimiter = self.input_items[0]["return"]
+    
+    def process(self):
+            pass
