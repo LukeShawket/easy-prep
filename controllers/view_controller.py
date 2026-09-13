@@ -1,5 +1,6 @@
 from tkinter import filedialog
 from ttkbootstrap.constants import *
+import tkinter as tk
 
 import views.global_view as v_g
 import views.home_view as v_h
@@ -7,7 +8,6 @@ import views.dashboard_view as v_d
 from views.scroll_frame import ScrollableFrame
 import views.process_view as v_p
 import views.preview as v_pre
-
 
 class ContrllerView:
 
@@ -33,6 +33,7 @@ class ContrllerView:
 
         self.showing_preview = False
         self.showing_view = False
+        self.showing_export = False
 
         self.v_global = v_g.GlobalView(app=app)
         self.v_home = v_h.HomeView(app=app)
@@ -50,6 +51,7 @@ class ContrllerView:
         self.funcs["preview"] = self.preview
         self.funcs["clear"] = self.clear
         self.funcs["view"] = self.view_original
+        self.funcs["export"] = self.export
 
     def get_path(self, func_after):
         self.v_home.btn_open_file.config(command=lambda: self.ask_file(func=func_after))
@@ -167,6 +169,7 @@ class ContrllerView:
 
             self.showing_preview = True
             self.showing_view = False
+            self.showing_export = False
 
             if frame:
                 for widget in frame.winfo_children():
@@ -193,7 +196,7 @@ class ContrllerView:
                     self.processed_df = app.start_app(self.current_sheet)
 
 
-            self.preview_frame = self.v_preview.preview_process(frame, self.processed_df)
+            self.v_preview.preview_process(frame, self.processed_df)
 
         else:
 
@@ -219,13 +222,14 @@ class ContrllerView:
 
             self.showing_view = True
             self.showing_preview = False
+            self.showing_export = False
 
             if frame:
                 for widget in frame.winfo_children():
                     if widget != toolbar:
                         widget.pack_forget()
 
-            self.preview_frame = self.v_preview.preview_process(frame, self.current_sheet)
+            self.v_preview.preview_process(frame, self.current_sheet)
 
         else:
 
@@ -240,4 +244,45 @@ class ContrllerView:
     def clear(self):
 
         self.update_process_panel()
+
+
+    def add_sheet():
+        pass
+
+
+    def export(self):
+
+        frame = self.v_dashboard.work_frame
+        toolbar = self.v_process.toolbar
+
+        if frame:
+            for widget in frame.winfo_children():
+                if getattr(widget, "widget_id", None) == "view":
+                    widget.destroy()
+
+        if not self.showing_export:
+
+            self.showing_export = True
+            self.showing_view = False
+            self.showing_preview = False
+
+            if frame:
+                for widget in frame.winfo_children():
+                    if widget != toolbar:
+                        widget.pack_forget()
+
+            self.v_process.load_export_items(frame=frame)
+
+        else:
+
+            self.showing_export = False
+
+            if frame:
+                for widget in frame.winfo_children():
+                    if widget != toolbar:
+                        widget.pack(fill=BOTH, expand=True)
+
+
+
+        
                         
