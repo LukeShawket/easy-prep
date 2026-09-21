@@ -88,7 +88,11 @@ class ProcessView:
 
                 elif field_type == "check":
                     widget, var = self.load_check_field(row=row)
-                    widget.configure(command=lambda v= var, f=field: self.check_btn_update(var=v, fld=f))
+                    for child in widget.winfo_children():
+                        if isinstance(child, ttk.Checkbutton):
+                            child.configure(command=lambda w=widget, v=var, f=field: self.check_btn_update(wid=w, var=v, fld=f))
+                        else:
+                            child.configure(text=field["notify_false"])
 
                 elif field_type == "multi-select":
                     if field_content == "columns":
@@ -108,17 +112,23 @@ class ProcessView:
 
 
 
-    def check_btn_update(self, var, fld):
+    def check_btn_update(self, wid, var, fld):
         next_state = fld.get("state") + 1
         for field in self.input_schema:
             if field.get("state") == next_state:
                 if var.get() != field.get("depend_value"):
                     self.gui_index -= 1
+                    for child in wid.winfo_children():
+                        if isinstance(child, ttk.Label):
+                            child.configure(text=fld["notify_false"])
                     self.render_fields(wipe=True)
 
                 else:
                     self.gui_index += 1
                     self.last_added_field_id = field.get("id")
+                    for child in wid.winfo_children():
+                        if isinstance(child, ttk.Label):
+                            child.configure(text=fld["notify_true"])
                     self.render_fields()
                     
                 break
@@ -141,9 +151,13 @@ class ProcessView:
         return widget, var
 
     def load_check_field(self, row):
-        var = tk.BooleanVar()
-        widget = ttk.Checkbutton(row,variable=var,bootstyle="round-toggle")
+
+        widget = ttk.Frame(row)
         widget.field_id = id
+
+        var = tk.BooleanVar()
+        ttk.Checkbutton(widget, variable=var, bootstyle="round-toggle").pack(side=LEFT,fill=X,expand=True)
+        ttk.Label(widget).pack(side=LEFT,fill=X,expand=True)
 
         return widget, var
 
@@ -174,7 +188,7 @@ class ProcessView:
         return widget, var
 
 
-    def load_export_items(self, frame):
+    def load_export_items(self, frame, path):
 
         export_frame = ttk.Frame(frame)
         export_frame.pack(side=LEFT, fill=BOTH, expand=True)
@@ -202,6 +216,17 @@ class ProcessView:
 
         scrollable_frame.bind("<Configure>", _on_frame_configure)
         canvas.bind("<Configure>", _on_canvas_configure)
+
+        # File name
+        name_frame = ttk.Labelframe(scrollable_frame, text=" File Name ", padding=15)
+        name_frame.pack(fill=X, pady=(0, 20))
+        self.filename_var = tk.StringVar(value="New File")
+
+        ttk.Entry(
+            name_frame,
+            text="Enter a file name...",
+            textvariable=self.filename_var,
+        ).pack(side=LEFT, fill=X, expand=YES, padx=(0, 10))
 
         # File Format Selection (packed into scrollable_frame)
         format_frame = ttk.Labelframe(scrollable_frame, text=" File Format ", padding=15)
@@ -254,7 +279,7 @@ class ProcessView:
         dest_frame = ttk.Labelframe(scrollable_frame, text=" Export Destination ", padding=15)
         dest_frame.pack(fill=X, pady=(0, 20))
 
-        self.filepath_var = tk.StringVar(value="Select destination path...")
+        self.filepath_var = tk.StringVar(value=path)
         
         entry_container = ttk.Frame(dest_frame)
         entry_container.pack(fill=X)
@@ -276,6 +301,7 @@ class ProcessView:
 
         export_values = {}
 
+        export_values['file_name'] = self.filename_var.get()
         export_values['format'] = self.export_format.get()
         export_values['include_header'] = self.include_header.get()
         export_values['include_index'] = self.index_var.get()

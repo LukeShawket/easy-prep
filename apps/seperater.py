@@ -6,6 +6,7 @@ class Seperater:
 
         self.b_name = "Split by Delimiter"
         self.title = " DELIMITER "
+        self.default_path = "C:/Users/fxiaowuk/Downloads"
 
         self.input_items = [
                             {
@@ -25,6 +26,8 @@ class Seperater:
                                 "state": 1,
                                 "name": "Add Columns",
                                 "type": "check",
+                                "notify_true": "Selected Columns",
+                                "notify_false": "All Columns",
                                 "content": "continue",
                                 "return": False
                             },

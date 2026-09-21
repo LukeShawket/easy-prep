@@ -27,6 +27,7 @@ class ContrllerView:
         self.current_sheet = None
         self.current_columns = None
         self.current_app_name = None
+        self.current_app = None
         self.confirm_btn = None
         self.apps = []
         self.funcs = {}
@@ -148,9 +149,10 @@ class ContrllerView:
 
         for app in self.apps:
             if self.current_app_name == app.b_name:
-                self.vars = self.v_process.process_panel(title=f" {app.title} ",
+                self.current_app = app
+                self.vars = self.v_process.process_panel(title=f" {self.current_app.title} ",
                                             frame=self.v_dashboard.work_frame,
-                                            fields=app.input_items,
+                                            fields=self.current_app.input_items,
                                             scrl = ScrollableFrame,
                                             cls=self.current_columns,
                                             funcs=self.funcs
@@ -182,23 +184,21 @@ class ContrllerView:
                         widget.pack_forget()
 
             multiple_values = [] 
-            for app in self.apps:
-                if app.b_name == self.current_app_name:
-                    for name, object in self.vars.items():
-                        if type(object) == dict:
-                            for btn_name, value in object.items():
-                                if value.get():
-                                    multiple_values.append(btn_name)
-                                    for item in app.input_items:
-                                        if item["name"] == name:
-                                            item["return"] = multiple_values
-
-                        else:
-                            for item in app.input_items:
+            for name, object in self.vars.items():
+                if type(object) == dict:
+                    for btn_name, value in object.items():
+                        if value.get():
+                            multiple_values.append(btn_name)
+                            for item in self.current_app.input_items:
                                 if item["name"] == name:
-                                    item["return"] = object.get()
+                                    item["return"] = multiple_values
 
-                    self.processed_df = app.start_app(self.current_sheet)
+                else:
+                    for item in self.current_app.input_items:
+                        if item["name"] == name:
+                            item["return"] = object.get()
+
+            self.processed_df = self.current_app.start_app(self.current_sheet)
 
 
             self.v_preview.preview_process(frame, self.processed_df)
@@ -262,6 +262,8 @@ class ContrllerView:
 
         frame = self.v_dashboard.work_frame
         toolbar = self.v_process.toolbar
+        default_path = self.current_app.default_path
+
         if not self.confirm_btn:
             self.confirm_btn = ttk.Button(toolbar,text="Confirm",width=10,bootstyle=SECONDARY,command=self.confirm_export)
 
@@ -281,7 +283,7 @@ class ContrllerView:
                     if widget != toolbar:
                         widget.pack_forget()
 
-            self.v_process.load_export_items(frame=frame)
+            self.v_process.load_export_items(frame=frame, path=default_path)
 
             self.confirm_btn.pack(side=LEFT)
 
