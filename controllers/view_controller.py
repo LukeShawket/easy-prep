@@ -1,0 +1,327 @@
+from tkinter import filedialog
+from ttkbootstrap.constants import *
+import ttkbootstrap as ttk
+
+from models.export import Exporter as ext
+import views.global_view as v_g
+import views.home_view as v_h
+import views.dashboard_view as v_d
+from views.scroll_frame import ScrollableFrame
+import views.process_view as v_p
+import views.preview as v_pre
+import views.export_view as v_exp
+import views.addsheet_view as v_add
+
+class ContrllerView:
+
+    def __init__(self, app):
+        self.main_frame = None
+        self.file_path = None
+        self.folder_path = None
+
+        self.sheet_count = None
+        self.row_count = None
+        self.column_count = None
+        self.file_size = None
+        self.display_table = None
+        self.file_type = None
+        self.raw_data = None
+        self.current_sheet = None
+        self.current_columns = None
+        self.current_app_name = None
+        self.current_app = None
+        self.confirm_btn = None
+        self.apps = []
+        self.funcs = {}
+        self.vars = None
+        self.processed_df = None
+
+        self.current_view = ""
+        self.showing_tool_content = False
+
+        self.v_global = v_g.GlobalView(app=app)
+        self.v_home = v_h.HomeView(app=app)
+        self.v_dashboard = v_d.DashboardView()
+        self.v_process = v_p.ProcessView()
+        self.v_preview = v_pre.Preview()
+        self.v_export = v_exp.ExportView()
+        self.v_addsheet = v_add.AddSheetView()
+        
+        self.main_frame = self.v_global.content_frame
+
+
+    def start_app(self):
+
+        self.v_home.build(self.main_frame)
+
+        self.funcs["preview"] = self.preview
+        self.funcs["clear"] = self.clear
+        self.funcs["view"] = self.view_original
+        self.funcs["export"] = self.export
+        self.funcs["addsheet"] = self.add_sheet
+
+
+
+    def get_path(self, func_after):
+        self.v_home.btn_open_file.config(command=lambda: self.ask_file(func=func_after))
+        self.v_home.btn_open_folder.config(command=self.ask_folder)
+
+    def ask_file(self, func):
+        self.file_path = filedialog.askopenfilename()
+        func(self.file_path)
+
+    def ask_folder(self, func):
+        self.folder_path = filedialog.askdirectory()
+
+    def assign_file_info(self, cnt_sheet, cnt_row, cnt_clmn, table, _type, data, size):
+        self.sheet_count = cnt_sheet
+        self.row_count = cnt_row
+        self.column_count = cnt_clmn
+        self.display_table = table
+        self.file_type = _type
+        self.raw_data = data
+        self.file_size = size
+
+        self.load_dashboard()
+
+    def load_dashboard(self):
+        self.v_global.clear_content()
+
+        for key, value in self.raw_data.items():
+            if not self.current_sheet:
+                self.current_sheet = value
+                break
+        self.v_dashboard.create_dashboard_frame(content_frame=self.main_frame)
+        self.v_dashboard.create_workspace_header(sheet_count=self.sheet_count, 
+                                                 row_count= self.row_count, 
+                                                 column_count=self.column_count, 
+                                                 file_size=self.file_size
+                                                 )
+        self.v_dashboard.create_workspace_main(_type=self.file_type, data=self.raw_data, display_table=self.display_table,act_names=self.get_app_names())
+        # Assign sheet buttons
+        for btn in self.v_dashboard.sheet_buttons:
+            btn.configure(command=lambda b=btn: self.update_dashboard(b=b))
+
+        self.current_sheet_name = str(self.v_dashboard.sheet_buttons[0].cget("text"))
+
+        # Assign action buttons
+        for btn in self.v_dashboard.act_buttons:
+                    btn.configure(command=lambda b=btn: self.update_process_panel(b=b))
+
+
+        self.v_home.update_status(_text=f"Loaded file type: {self.file_type} | Sheet: {self.current_sheet_name} | Status: Ready")
+
+
+    def update_dashboard(self, b):
+        b.configure(bootstyle=PRIMARY)
+        self.current_btn = b
+        self.current_sheet_name = str(b.cget("text"))
+
+        if len(self.v_dashboard.sheet_buttons) > 1:
+            for btn in self.v_dashboard.sheet_buttons:
+                if btn != b:
+                    btn.configure(bootstyle=(OUTLINE, PRIMARY))
+
+        self.current_sheet = self.raw_data[self.current_sheet_name]
+
+        for title, item in self.v_dashboard.updatables.items():
+            if title == "Rows":
+                item.configure(text=len(self.current_sheet))
+            elif title == "Columns":
+                item.configure(text=len(self.current_sheet.columns))
+
+        self.v_dashboard.work_panel(parent=self.v_dashboard.workspace,data=self.current_sheet)
+
+        for btn in self.v_dashboard.act_buttons:
+            btn.configure(bootstyle=(OUTLINE, PRIMARY))
+
+
+        self.v_home.update_status(_text=f"Sheet: {self.current_sheet_name}")
+
+
+
+    def get_app_names(self):
+        app_names = []
+        for app in self.apps:
+            app_names.append(app.b_name)
+
+        return app_names
+
+    def update_process_panel(self, b=None):
+
+        if b:
+            self.current_app_name = b.cget("text")
+            b.configure(bootstyle=PRIMARY)
+
+            if len(self.v_dashboard.act_buttons) > 1:
+                for btn in self.v_dashboard.act_buttons:
+                    if btn != b:
+                        btn.configure(bootstyle=(OUTLINE, PRIMARY))
+
+        # Fix here
+        self.current_columns = self.current_sheet.columns.tolist()
+
+        for app in self.apps:
+            if self.current_app_name == app.b_name:
+                self.current_app = app
+                self.vars = self.v_process.process_panel(title=f" {self.current_app.title} ",
+                                            frame=self.v_dashboard.work_frame,
+                                            fields=self.current_app.input_items,
+                                            scrl = ScrollableFrame,
+                                            cls=self.current_columns,
+                                            funcs=self.funcs
+                                        )
+
+        self.v_home.update_status(_text=f"Sheet: {self.current_sheet_name} | Action: {self.current_app_name}")
+
+
+    def preview(self):
+        if self.current_view != "" and self.current_view != "preview":
+            self.showing_tool_content = False
+        self.current_view = "preview"
+        self.tool_update()
+
+    def view_original(self):
+        if self.current_view != "" and self.current_view != "view":
+            self.showing_tool_content = False
+        self.current_view = "view"
+        self.tool_update()
+
+    def add_sheet(self):
+        if self.current_view != "" and self.current_view != "addsheet":
+            self.showing_tool_content = False
+        self.current_view = "addsheet"
+        self.tool_update()
+
+    def export(self):
+        if self.current_view != "" and self.current_view != "export":
+            self.showing_tool_content = False
+        self.current_view = "export"
+        self.tool_update()
+
+
+    def clear(self):
+        self.showing_tool_content = False
+        self.current_view = ""
+        self.update_process_panel()
+
+
+    def tool_update(self):
+        frame = self.v_dashboard.work_frame
+        toolbar = self.v_process.toolbar
+
+        if frame:
+            for widget in frame.winfo_children():
+                if getattr(widget, "widget_id", None) == "view":
+                    widget.destroy()
+
+        if not self.showing_tool_content:
+
+            self.showing_tool_content = True
+            if self.confirm_btn:
+                self.confirm_btn.destroy()
+                self.confirm_btn = None
+
+            if frame:
+                for widget in frame.winfo_children():
+                    if widget != toolbar:
+                        widget.pack_forget()
+
+            self.set_app_variables()
+
+            if self.current_view == "preview":
+                self.processed_df = self.current_app.start_app(self.current_sheet)
+                self.v_preview.preview_process(frame, self.processed_df)
+            elif self.current_view == "view":
+                self.v_preview.preview_process(frame, self.current_sheet)
+            elif self.current_view == "addsheet":
+                self.v_addsheet.load_sheet_items(frame=frame)
+                if not self.confirm_btn:
+                    self.confirm_btn = ttk.Button(toolbar,text="Confirm",width=10,bootstyle=SECONDARY,command=self.confirm_addsheet)
+                self.confirm_btn.pack(side=LEFT)
+            elif self.current_view == "export":
+                default_path = self.current_app.default_path
+                self.v_export.load_export_items(frame=frame, path=default_path)
+                if not self.confirm_btn:
+                    self.confirm_btn = ttk.Button(toolbar,text="Confirm",width=10,bootstyle=SECONDARY,command=self.confirm_export)
+                self.confirm_btn.pack(side=LEFT)
+
+
+        else:
+            if self.confirm_btn:
+                self.confirm_btn.destroy()
+                self.confirm_btn = None
+            self.current_view = ""
+            self.showing_tool_content = False
+            if frame:
+                for widget in frame.winfo_children():
+                    if widget != toolbar:
+                        widget.pack(fill=BOTH, expand=True)
+
+
+    def set_app_variables(self):
+
+        items_by_id = {item["id"]: item for item in self.current_app.input_items}
+        for id, obj in self.vars.items():
+            item = items_by_id.get(id)
+            if not item:
+                continue
+
+            if isinstance(obj, dict):
+                item["return"] = [btn_name for btn_name, value in obj.items() if value.get()]
+            else:
+                item["return"] = obj.get()
+
+
+    def confirm_export(self):
+
+        self.set_app_variables()
+    
+        self.processed_df = self.current_app.start_app(self.current_sheet)
+
+        self.v_home.update_status(_text=ext.export(df=self.processed_df, export_schema=self.v_export.get_export_values()))
+
+
+    def confirm_addsheet(self):
+
+        self.set_app_variables()
+
+        export_schema=self.v_addsheet.get_file_meta()
+
+        file_name = export_schema['file_name']
+        is_owerwrite = export_schema['overwrite']
+
+        self.processed_df = self.current_app.start_app(self.current_sheet)
+
+        if not is_owerwrite:
+            if file_name in self.raw_data:
+                self.v_home.update_status(_text="This sheet name already exist in sheets. If you want to overwrite existing sheet, select owerwrite option.")
+            else:
+                self.raw_data[file_name] = self.processed_df
+                self.v_dashboard.add_new_sheet(text=file_name)
+                self.v_dashboard.scroll_sheets_view(value=1.0)
+
+                self.update_dashboard(b=self.v_dashboard.sheet_buttons[-1])
+                # Assign sheet buttons
+                for btn in self.v_dashboard.sheet_buttons:
+                    btn.configure(command=lambda b=btn: self.update_dashboard(b=b))
+        else:
+            self.raw_data[self.current_sheet_name] = self.processed_df
+
+            self.update_dashboard(b=self.current_btn)
+            # Assign sheet buttons
+            for btn in self.v_dashboard.sheet_buttons:
+                btn.configure(command=lambda b=btn: self.update_dashboard(b=b))
+
+            current_btn_index = self.v_dashboard.sheet_buttons.index(self.current_btn)
+            scroll_val = round(current_btn_index/len(self.v_dashboard.sheet_buttons), 1)
+            self.v_dashboard.scroll_sheets_view(value=scroll_val)
+
+            
+
+
+
+
+
+        
+                        
