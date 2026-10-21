@@ -1,12 +1,20 @@
+# Libraries
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
-
-import controllers.view_controller as c_view
-import controllers.app_controller as c_app
-
-import models.parser as ps
 from pathlib import Path
 import ast
+
+# Controllers
+import controllers.view_controller as c_view
+
+# Services
+from services.parser import Parser
+from services.plugin_loader import load_plugins
+from services.data_worker import DataWorker
+
+# Models
+import models.workspace as w_space
+
 
 
 
@@ -16,15 +24,13 @@ class App():
 
         # Initialize
         self.app = ttk.Window(title="Easy Prep",themename="darkly",size=(1200, 800))
+        self.worker = DataWorker(self.app)
         self.reset_callback = reset_callback
-        self.ctrl_view = c_view.ContrllerView(app=self.app)
-        self.ctrl_app = c_app.AppController()
-        self.parser = ps.Parser()
-        self.data = None
-        self.apps = []
-
         # Insert more tools here and drop your .py file in tools folder
+        self.work_space = w_space.WorkSpace()
+        self.ctrl_view = c_view.ContrllerView(app=self.app, w_space=self.work_space)
         self.app_base = self.get_app_dict()
+        self.apps = load_plugins(app_base=self.app_base)
 
         # Core starts here.
         self.run_app()
@@ -32,21 +38,44 @@ class App():
         self.app.mainloop()
 
     def run_app(self):
-        self.ctrl_view.start_app()
-        self.apps = self.ctrl_app.create_apps(app_base=self.app_base)
+        self.ctrl_view.start_app(parse_callback=self.parse_file)
         self.ctrl_view.apps = self.apps
-        self.ctrl_view.get_path(func_after=self.parse_file)
 
+     
     def parse_file(self, path):
-        self.data = self.parser.parse_file(file_path=path)
-        self.ctrl_view.assign_file_info(cnt_sheet=self.parser.get_sheet_count(),
-                                        cnt_row=len(self.parser.get_first_table()),
-                                        cnt_clmn=len(self.parser.get_first_table().columns),
-                                        table=self.parser.get_first_table(),
-                                        _type=self.parser.flag,
-                                        data=self.data,
-                                        size=self.parser.get_memory_usage(file_path=self.ctrl_view.file_path)
-                                        )
+        self.worker.run(
+            task=lambda progress: self.parse_task(path, progress),
+            on_success=self._file_loaded,
+            on_progress=self.update_progress
+        )
+
+    def update_progress(self, percent, message):
+
+        self.ctrl_view.show_progress(value=percent)
+
+
+    def parse_task(self, path, progress):
+
+        progress(0, "Loading file")
+
+        parser = Parser()
+        data = parser.parse_file(path)
+
+        progress(100, "Done")
+
+        return data, parser
+
+
+    def _file_loaded(self, result):
+
+        data, parser = result
+
+        self.work_space.load_work_space_data(
+            data=data,
+            parser=parser
+        )
+
+        self.ctrl_view.load_dashboard()
 
 
     def get_app_dict(self):

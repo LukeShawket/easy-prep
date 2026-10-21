@@ -13,22 +13,20 @@ class GlobalView:
 
 
     def create_header(self):
-        header = ttk.Frame(self.app, padding=(30, 20))
-        header.pack(fill=X)
+        self.header = ttk.Frame(self.app, padding=(30, 20))
+        self.header.pack(fill=X)
 
-        ttk.Label(
-            header,
-            text="Easy Prep",
-            font=("Segoe UI", 28, "bold")
-        ).pack(side=LEFT)
+        ttk.Label(self.header,text="Easy Prep",font=("Segoe UI", 28, "bold")).pack(side=LEFT)
 
-        ttk.Button(
-            header,
-            text="Settings",
-            bootstyle=(OUTLINE, SECONDARY)
-        ).pack(side=RIGHT)
+        ttk.Button(self.header,text="Settings",bootstyle=(OUTLINE, SECONDARY), width=10).pack(side=RIGHT)
+        
 
-        return header
+        return self.header
+
+    def add_global_buttons(self):
+        ttk.Button(self.header,text="Print",bootstyle=(OUTLINE, SECONDARY), width=10).pack(side=RIGHT, padx=5)
+        ttk.Button(self.header,text="Export",bootstyle=(OUTLINE, SECONDARY), width=10).pack(side=RIGHT)
+        ttk.Button(self.header,text="Home",bootstyle=(OUTLINE, SECONDARY), width=10).pack(side=RIGHT, padx=5)
 
     def clear_content(self):
         for widget in self.content_frame.winfo_children():

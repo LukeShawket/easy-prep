@@ -36,16 +36,18 @@ class ProcessView:
         ttk.Button(self.toolbar,text="Preview",width=10,bootstyle=SECONDARY,command=funcs["preview"]).pack(side=LEFT)
         ttk.Button(self.toolbar,text="Clear",width=10,bootstyle=SECONDARY,command=funcs["clear"]).pack(side=LEFT, padx=5)
         ttk.Button(self.toolbar,text="Add Sheet",width=10,bootstyle=SECONDARY,command=funcs["addsheet"]).pack(side=LEFT)
-        ttk.Button(self.toolbar,text="Export",width=10,bootstyle=SECONDARY,command=funcs["export"]).pack(side=LEFT).pack(side=LEFT, padx=5)
+        ttk.Button(self.toolbar,text="Export",width=10,bootstyle=SECONDARY,command=funcs["export"]).pack(side=LEFT, padx=5)
 
         # Scrollable Area
-        scrl_area = scrl(frame)
-        scrl_area.pack(fill=BOTH, expand=True)
-        form_frame = scrl_area.scrollable_frame
+        form_frame = scrl(frame)
+        form_frame.pack(fill=BOTH, expand=True)
 
         # Optional "card" container
-        self.form_card = ttk.Labelframe(form_frame,text="Input Details",bootstyle="info",padding=15)
-        self.form_card.pack(fill=X, padx=10, pady=10)
+        self.form_card = ttk.Labelframe(form_frame.content,text="Input Details",bootstyle="info",padding=15)
+        self.form_card.pack(fill=BOTH, padx=10, pady=10)
+
+        frame.update_idletasks()
+
 
 
         var = self.render_fields()

@@ -12,6 +12,7 @@ class DashboardView:
         self.updatables = {}
         self.selected_btn = None
         self.work_frame = None
+        self.table_view = None
 
 
     def create_dashboard_frame(self, content_frame):
@@ -34,11 +35,7 @@ class DashboardView:
 
         # FILE INFO HEADER
 
-        ttk.Label(
-            self.dashboard_frame,
-            text="File Overview",
-            font=("Segoe UI", 18, "bold")
-        ).pack(anchor=W, pady=(0, 15))
+        ttk.Label(self.dashboard_frame, text="File Overview",font=("Segoe UI", 18, "bold")).pack(anchor=W, pady=(0, 15))
 
         # STATS CARDS
 
@@ -54,24 +51,9 @@ class DashboardView:
 
         for title, value in stats:
 
-            card = ttk.Labelframe(
-                cards,
-                text=f" {title} ",
-                padding=20
-            )
+            card = ttk.Labelframe(cards,text=f" {title} ",padding=20)
 
-            card.pack(
-                side=LEFT,
-                fill=X,
-                expand=True,
-                padx=5
-            )
-
-            ttk.Label(
-                card,
-                text=title,
-                font=("Segoe UI", 10),
-            ).pack()
+            card.pack(side=LEFT,fill=X,expand=True,padx=5)
 
             kpi_lables = ttk.Label(card,text=value,font=("Segoe UI", 18, "bold"))
             kpi_lables.pack(pady=(5, 0))
@@ -80,14 +62,10 @@ class DashboardView:
 
 
 
-    def create_workspace_main(self, _type, data, display_table, act_names):
+    def create_workspace_main(self, _type, data, display_table, act_names, scrll):
         
         self.workspace = ttk.Frame(self.dashboard_frame)
-        self.workspace.pack(
-            fill=BOTH,
-            expand=True,
-            pady=(20, 0)
-        )
+        self.workspace.pack(fill=BOTH,expand=True,pady=(20, 0))
 
         self.create_sheets_panel(parent=self.workspace, type_flag=_type, data=data)
         self.work_panel(parent=self.workspace, data=display_table, )
@@ -98,12 +76,12 @@ class DashboardView:
 
     def create_sheets_panel(self, parent, type_flag=None, data=None):
 
-        frame = ttk.Labelframe(parent, text=" SHEETS ",width=200)
-        frame.pack(side=LEFT,padx=10,fill=Y)
+        frame = ttk.Labelframe(parent, text=" SHEETS ", width=200)
+        frame.pack(side=LEFT, padx=10, fill=Y)
         frame.pack_propagate(False)
 
         self.sheets_canvas = tk.Canvas(frame, highlightthickness=0, bd=0, relief="flat", bg=ttk.Style().colors.bg)
-        scrollbar = ttk.Scrollbar(frame,orient=VERTICAL,command=self.sheets_canvas.yview,bootstyle="round")
+        scrollbar = ttk.Scrollbar(frame, orient=VERTICAL, command=self.sheets_canvas.yview, bootstyle="round")
         self.sheets_canvas.configure(yscrollcommand=scrollbar.set)
         self.button_frame = ttk.Frame(self.sheets_canvas, borderwidth=0)
         window_id = self.sheets_canvas.create_window((0, 0), window=self.button_frame, anchor="nw")
@@ -114,33 +92,66 @@ class DashboardView:
         )
 
         self.sheets_canvas.bind(
-        "<Configure>",
-        lambda e: self.sheets_canvas.itemconfigure(window_id, width=e.width)
+            "<Configure>",
+            lambda e: self.sheets_canvas.itemconfigure(window_id, width=e.width)
         )
-
 
         # Pack layout elements
         scrollbar.pack(side=RIGHT, fill=Y)
         self.sheets_canvas.pack(side=LEFT, fill=BOTH, expand=True)
 
+        # Mouse Wheel Scroll Logic
+        def _on_mousewheel(event):
+            if event.delta:
+                self.sheets_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+            elif event.num == 4:
+                self.sheets_canvas.yview_scroll(-1, "units")
+            elif event.num == 5:
+                self.sheets_canvas.yview_scroll(1, "units")
 
+        def _bind_to_mousewheel(event):
+            self.sheets_canvas.bind_all("<MouseWheel>", _on_mousewheel) # Windows
+            self.sheets_canvas.bind_all("<Button-4>", _on_mousewheel) # Linux Up
+            self.sheets_canvas.bind_all("<Button-5>", _on_mousewheel) # Linux Down
+
+        def _unbind_from_mousewheel(event):
+            self.sheets_canvas.unbind_all("<MouseWheel>")
+            self.sheets_canvas.unbind_all("<Button-4>")
+            self.sheets_canvas.unbind_all("<Button-5>")
+
+        # Base background bindings
+        self.sheets_canvas.bind("<Enter>", _bind_to_mousewheel)
+        self.sheets_canvas.bind("<Leave>", _unbind_from_mousewheel)
+        self.button_frame.bind("<Enter>", _bind_to_mousewheel)
+        self.button_frame.bind("<Leave>", _unbind_from_mousewheel)
 
         if type_flag == "sheets" or type_flag == "sheet":
-
             self.sheet_buttons.clear()
 
             for key, value in data.items():
-                btn = ttk.Button(self.button_frame,text=key,bootstyle=(OUTLINE, PRIMARY),padding=(10, 12))
-                btn.pack(fill=X,padx=10,pady=4)
+                btn = ttk.Button(self.button_frame, text=key, bootstyle=(OUTLINE, PRIMARY), padding=(10, 12))
+                btn.pack(fill=X, padx=10, pady=4)
+                
+                # Bind the enter/leave scroll events directly to the button
+                btn.bind("<Enter>", _bind_to_mousewheel)
+                btn.bind("<Leave>", _unbind_from_mousewheel)
+                
                 self.sheet_buttons.append(btn)
-
         else:
             self.sheet_buttons.clear()
-            btn = ttk.Button(self.button_frame,text="Sheet",bootstyle=(OUTLINE, PRIMARY),padding=(10, 12))
-            btn.pack(fill=X,padx=10,pady=4)
+            btn = ttk.Button(self.button_frame, text="Sheet", bootstyle=(OUTLINE, PRIMARY), padding=(10, 12))
+            btn.pack(fill=X, padx=10, pady=4)
+            
+            # Bind the enter/leave scroll events directly to the fallback button
+            btn.bind("<Enter>", _bind_to_mousewheel)
+            btn.bind("<Leave>", _unbind_from_mousewheel)
+            
             self.sheet_buttons.append(btn)
 
-        self.sheet_buttons[0].configure(bootstyle=PRIMARY)
+        if self.sheet_buttons:
+            self.sheet_buttons[0].configure(bootstyle=PRIMARY)
+
+
 
     def scroll_sheets_view(self, value):
         self.sheets_canvas.update_idletasks()
@@ -154,9 +165,8 @@ class DashboardView:
         self.sheet_buttons.append(new_btn)
 
 
-    # ==================================
+
     # DATA PREVIEW PANEL
-    # ==================================
 
     def work_panel(self, parent, data):
 
@@ -178,33 +188,7 @@ class DashboardView:
         view_frame = ttk.Frame(self.work_frame)
         view_frame.pack(fill=BOTH,expand=True)
 
-        # Scrollbars
-        y_scroll = ttk.Scrollbar(view_frame, orient="vertical", bootstyle="round")
-        x_scroll = ttk.Scrollbar(view_frame, orient="horizontal", bootstyle="round")
-
-        self.view_tree = ttk.Treeview(
-            view_frame,
-            columns=list(data.columns),
-            show="headings",
-            yscrollcommand=y_scroll.set,
-            xscrollcommand=x_scroll.set
-        )
-
-        y_scroll.config(command=self.view_tree.yview)
-        x_scroll.config(command=self.view_tree.xview)
-
-        # Column headers
-        for col in data.columns:
-            self.view_tree.heading(col, text=col, anchor=W)
-            self.view_tree.column(col, width=120, anchor=W)
-        # Rows
-        for _, row in data.iterrows():
-            self.view_tree.insert("", "end", values=list(row))
-
-        # Layout
-        y_scroll.pack(side=RIGHT, fill="y")
-        x_scroll.pack(side=BOTTOM, fill="x")
-        self.view_tree.pack(side=LEFT, fill=BOTH, expand=True)
+        self.table_view.preview_process(view_frame, data)
 
 
     # ACTIONS PANEL
@@ -212,11 +196,11 @@ class DashboardView:
     def create_actions_panel(self, parent, action_names):
 
         frame = ttk.Labelframe(parent, text=" ACTIONS ", width=200)
-        frame.pack(side=RIGHT,padx=10,fill=Y)
+        frame.pack(side=RIGHT, padx=10, fill=Y)
         frame.pack_propagate(False)
 
         canvas = tk.Canvas(frame, highlightthickness=0, bd=0, relief="flat", bg=ttk.Style().colors.bg)
-        scrollbar = ttk.Scrollbar(frame,orient=VERTICAL,command=canvas.yview,bootstyle="round")
+        scrollbar = ttk.Scrollbar(frame, orient=VERTICAL, command=canvas.yview, bootstyle="round")
         canvas.configure(yscrollcommand=scrollbar.set)
         button_frame = ttk.Frame(canvas, borderwidth=0)
         window_id = canvas.create_window((0, 0), window=button_frame, anchor="nw")
@@ -227,14 +211,38 @@ class DashboardView:
         )
 
         canvas.bind(
-        "<Configure>",
-        lambda e: canvas.itemconfigure(window_id, width=e.width)
+            "<Configure>",
+            lambda e: canvas.itemconfigure(window_id, width=e.width)
         )
-
 
         # Pack layout elements
         scrollbar.pack(side=RIGHT, fill=Y)
         canvas.pack(side=LEFT, fill=BOTH, expand=True)
+
+        # Mouse Wheel Scroll Logic
+        def _on_mousewheel(event):
+            if event.delta:
+                canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+            elif event.num == 4:
+                canvas.yview_scroll(-1, "units")
+            elif event.num == 5:
+                canvas.yview_scroll(1, "units")
+
+        def _bind_to_mousewheel(event):
+            canvas.bind_all("<MouseWheel>", _on_mousewheel)  # Windows
+            canvas.bind_all("<Button-4>", _on_mousewheel)    # Linux scroll up
+            canvas.bind_all("<Button-5>", _on_mousewheel)    # Linux scroll down
+
+        def _unbind_from_mousewheel(event):
+            canvas.unbind_all("<MouseWheel>")
+            canvas.unbind_all("<Button-4>")
+            canvas.unbind_all("<Button-5>")
+
+        # Bind base container surfaces
+        canvas.bind("<Enter>", _bind_to_mousewheel)
+        canvas.bind("<Leave>", _unbind_from_mousewheel)
+        button_frame.bind("<Enter>", _bind_to_mousewheel)
+        button_frame.bind("<Leave>", _unbind_from_mousewheel)
 
         # Action Buttons
         for act_name in action_names:
@@ -246,6 +254,9 @@ class DashboardView:
             )
 
             self.act_buttons.append(btn)
+            btn.pack(fill=X, padx=10, pady=4)
 
-            btn.pack(fill=X,padx=10,pady=4)
+            # pass scroll control back to canvas when hovering over this specific button
+            btn.bind("<Enter>", _bind_to_mousewheel)
+            btn.bind("<Leave>", _unbind_from_mousewheel)
 

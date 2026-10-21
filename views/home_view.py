@@ -12,6 +12,7 @@ class HomeView:
         self.create_drop_zone(frame)
         self.create_bottom_section(frame)
         self.create_statusbar()
+        self.create_progressbar()
 
 
     def create_hero(self, parent):
@@ -20,7 +21,7 @@ class HomeView:
 
         ttk.Label(
             hero,
-            text="Your Company Name",
+            text="Your Workplace Name",
             font=("Segoe UI", 20, "bold")
         ).pack()
 
@@ -201,3 +202,31 @@ class HomeView:
     def update_status(self, _text):
 
         self.status_label.configure(text=_text)
+
+
+    def create_progressbar(self):
+
+        self.progress_frame = ttk.Frame(self.app, padding=10)
+        self.progress_frame.pack(fill=X)
+
+        self.progress_bar = ttk.Progressbar(
+            self.progress_frame,
+            bootstyle="primary",
+            orient="horizontal",
+            mode="determinate",
+            value=75,
+            maximum=100
+        )
+
+        self.progress_bar.pack(fill=X)
+
+    def show_progress(self, value):
+
+        self.progress_bar.configure(value=0)
+
+        self.progress_frame.pack(fill=X)
+
+        self.progress_bar.configure(value=value)
+
+        if value >= 100:
+            self.progress_frame.pack_forget()
