@@ -125,28 +125,18 @@ class DashboardView:
         self.button_frame.bind("<Enter>", _bind_to_mousewheel)
         self.button_frame.bind("<Leave>", _unbind_from_mousewheel)
 
-        if type_flag == "sheets" or type_flag == "sheet":
-            self.sheet_buttons.clear()
+        self.sheet_buttons.clear()
 
-            for key, value in data.items():
-                btn = ttk.Button(self.button_frame, text=key, bootstyle=(OUTLINE, PRIMARY), padding=(10, 12))
-                btn.pack(fill=X, padx=10, pady=4)
-                
-                # Bind the enter/leave scroll events directly to the button
-                btn.bind("<Enter>", _bind_to_mousewheel)
-                btn.bind("<Leave>", _unbind_from_mousewheel)
-                
-                self.sheet_buttons.append(btn)
-        else:
-            self.sheet_buttons.clear()
-            btn = ttk.Button(self.button_frame, text="Sheet", bootstyle=(OUTLINE, PRIMARY), padding=(10, 12))
+        for key, value in data.items():
+            btn = ttk.Button(self.button_frame, text=key, bootstyle=(OUTLINE, PRIMARY), padding=(10, 12))
             btn.pack(fill=X, padx=10, pady=4)
             
-            # Bind the enter/leave scroll events directly to the fallback button
+            # Bind the enter/leave scroll events directly to the button
             btn.bind("<Enter>", _bind_to_mousewheel)
             btn.bind("<Leave>", _unbind_from_mousewheel)
             
             self.sheet_buttons.append(btn)
+
 
         if self.sheet_buttons:
             self.sheet_buttons[0].configure(bootstyle=PRIMARY)

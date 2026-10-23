@@ -42,5 +42,3 @@ class Exporter:
 
         else:
             raise ValueError(f"Unsupported format: {export_format}")
-
-        return "Exported!"

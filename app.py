@@ -26,9 +26,10 @@ class App():
         self.app = ttk.Window(title="Easy Prep",themename="darkly",size=(1200, 800))
         self.reset_callback = reset_callback
         # Insert more tools here and drop your .py file in tools folder
-        self.work_space = w_space.WorkSpace()
-        self.ctrl_view = c_view.ContrllerView(app=self.app, w_space=self.work_space)
         self.worker = DataWorker(self.app)
+        self.work_space = w_space.WorkSpace()
+        self.ctrl_view = c_view.ContrllerView(app=self.app, w_space=self.work_space, worker=self.worker)
+        
         self.app_base = self.get_app_dict()
         self.apps = load_plugins(app_base=self.app_base)
 
@@ -45,9 +46,10 @@ class App():
     def parse_file(self, path):
 
         self.worker.run(
-            task=lambda: self.parse_task(path),
+            tasks=lambda: self.parse_task(path),
             progress=self.ctrl_view.show_progress,
-            done=self._file_loaded
+            done=self._file_loaded,
+            p_text="Loading..."
         )
 
 

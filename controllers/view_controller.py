@@ -3,6 +3,7 @@ from ttkbootstrap.constants import *
 import ttkbootstrap as ttk
 
 from services.export import Exporter as ext
+from services.data_worker import DataWorker
 
 from models.workspace import WorkSpace
 
@@ -17,11 +18,12 @@ import views.addsheet_view as v_add
 
 class ContrllerView:
 
-    def __init__(self, app, w_space: WorkSpace):
+    def __init__(self, app, w_space: WorkSpace, worker: DataWorker):
         self.main_frame = None
         self.file_path = None
         self.folder_path = None
         self.work_space = w_space
+        self.worker = worker
 
         self.current_app_name = None
         self.current_app = None
@@ -53,7 +55,7 @@ class ContrllerView:
         self.funcs["preview"] = self.preview
         self.funcs["clear"] = self.clear
         self.funcs["view"] = self.view_original
-        self.funcs["export"] = self.export
+        self.funcs["export"] = self.click_export
         self.funcs["addsheet"] = self.add_sheet
 
         self.v_home.btn_open_file.config(command=lambda: self.ask_file(func=parse_callback))
@@ -68,10 +70,6 @@ class ContrllerView:
 
     def ask_folder(self, func):
         self.folder_path = filedialog.askdirectory()
-
-
-    def show_progress(self, animate=False):
-        self.v_home.update_status(_text="Loading...", animate=animate)
 
 
     def load_dashboard(self):
@@ -193,7 +191,7 @@ class ContrllerView:
         self.current_view = "addsheet"
         self.tool_update()
 
-    def export(self):
+    def click_export(self):
         if self.current_view != "" and self.current_view != "export":
             self.showing_tool_content = False
         self.current_view = "export"
@@ -277,22 +275,40 @@ class ContrllerView:
     def confirm_export(self):
 
         self.set_app_variables()
+        export_schema = self.v_export.get_export_values()
+        file_name = export_schema["file_name"]
+        folder_path = export_schema["folder_path"]
     
-        self.processed_df = self.current_app.start_app(self.work_space.current_sheet)
+        self.worker.run(
+            tasks=[self.run_plugin, lambda:self.export(exp_schema=export_schema)],
+            progress=self.show_progress,
+            p_text=f"{file_name} is being exported...",
+            c_text=f"{file_name} is exported at {folder_path}"
+        )
 
-        self.v_home.update_status(_text=ext.export(df=self.processed_df, export_schema=self.v_export.get_export_values()))
+    def export(self, exp_schema):
+
+        ext.export(df=self.processed_df, export_schema=exp_schema)
 
 
     def confirm_addsheet(self):
 
         self.set_app_variables()
 
+        self.worker.run(
+            tasks=self.run_plugin,
+            progress=self.show_progress,
+            done=self.update_after_addsheet,
+            p_text="New sheet is being added..."
+        )
+
+
+    def update_after_addsheet(self):
+        
         export_schema=self.v_addsheet.get_file_meta()
 
         file_name = export_schema['file_name']
         is_owerwrite = export_schema['overwrite']
-
-        self.processed_df = self.current_app.start_app(self.work_space.current_sheet)
 
         if not is_owerwrite:
             if file_name in self.work_space.raw_data:
@@ -317,6 +333,15 @@ class ContrllerView:
             current_btn_index = self.v_dashboard.sheet_buttons.index(self.current_btn)
             scroll_val = round(current_btn_index/len(self.v_dashboard.sheet_buttons), 1)
             self.v_dashboard.scroll_sheets_view(value=scroll_val)
+
+
+
+    def show_progress(self, _text=None, animate=False):
+        self.v_home.update_status(_text=_text, animate=animate)
+
+
+    def run_plugin(self):
+        self.processed_df = self.current_app.start_app(self.work_space.current_sheet)
 
             
 
