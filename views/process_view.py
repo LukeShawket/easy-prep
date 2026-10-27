@@ -62,37 +62,39 @@ class ProcessView:
         # Dynamic Fields
         for field in self.input_schema:
 
-            if field["state"] > self.max_state:
-                self.max_state = field["state"]
+            field_state = field.get("state")
+
+            if field_state:
+                if field_state > self.max_state:
+                    self.max_state = field_state
 
             if wipe:
                 for widget in self.form_card.winfo_children():
                     if hasattr(widget, "field_id"):
-                        if widget.field_id == _child["id"] or field["parent_id"] == _child["id"]:
+                        if widget.field_id == _child.get("id") or field.get("parent_id") == _child.get("id"):
                             widget.destroy()
                         
 
             elif int(field.get("state", 1)) == self.next_state and not wipe:
 
-                field_name = None
-                frame_name = None
-
-                if "name" in field:
-                    field_name = field["name"]
-                elif "frame_name" in field:
-                    frame_name = field["frame_name"]
-
-                    
-                field_id = field["id"]
-                field_type = field["type"]
-                field_content = field["content"]
-                is_child = field["is_child"]
                 widget = None
 
-                if not is_child:
+                outer_frame_name = field.get("outer_frame_name")
+                field_name = field.get("field_name")
+                frame_name = field.get("frame_name")
+                field_id = field.get("id")
+                field_type = field.get("type")
+                parent_id = field.get("parent_id")
+                default_text = field.get("default_text")
+
+
+                if not parent_id:
 
                     row = ttk.Frame(self.form_card)
                     row.pack(fill=X, pady=6)
+
+                    if outer_frame_name:
+                        self.form_card.configure(text=f" {outer_frame_name} ")
 
                     if field_name:
                         ttk.Label(row,text=field_name,width=20).pack(side=LEFT, padx=(0, 10))
@@ -114,6 +116,9 @@ class ProcessView:
                     elif field_type == "multi-select":
                         widget, var = self.load_multi_selection_field(row=row, _field=field, _frame_name=frame_name or field_name)
 
+                    elif field_type == "entry_box":
+                        widget, var = self.load_box_field(row=row, _frame_name=frame_name, default_txt=default_text)
+
                     else:
                             continue
                     
@@ -125,6 +130,9 @@ class ProcessView:
                             row = ttk.Frame(self.form_card)
                             row.field_id = _child["id"]
                             row.pack(fill=X, pady=6)
+
+                            if outer_frame_name:
+                                self.form_card.configure(text=f" {outer_frame_name} ")
 
                             if field_name:
                                 ttk.Label(row,text=field_name,width=20).pack(side=LEFT, padx=(0, 10))
@@ -145,6 +153,9 @@ class ProcessView:
         
                             elif field_type == "multi-select":
                                 widget, var = self.load_multi_selection_field(row=row, _field=field, _frame_name=frame_name or field_name)
+
+                            elif field_type == "entry_box":
+                                widget, var = self.load_box_field(row=row, _frame_name=frame_name, default_txt=default_text)
                                 
                             else:
                                     continue
@@ -164,7 +175,7 @@ class ProcessView:
     def check_btn_update(self, wid, var, fld):
         cld = None
         for f in self.input_schema:
-            if f["parent_id"] == fld["id"]:
+            if f.get("parent_id") == fld.get("id"):
                 cld = f
         if self.next_state < self.max_state:
             self.next_state = fld.get("state") + 1
@@ -218,8 +229,8 @@ class ProcessView:
 
         selection = (
             self.current_columns
-            if _field["content"] == "columns"
-            else _field["content"]
+            if _field.get("content") == "columns"
+            else _field.get("content")
         )
 
         # Outer container
@@ -312,6 +323,36 @@ class ProcessView:
         return widget, check_vars
 
 
+    def load_box_field(self, row, _frame_name, default_txt=None):
+
+        widget = row
+        # Outer container
+        if _frame_name:
+            widget = ttk.Labelframe(
+                row,
+                text=f" {_frame_name} ",
+                padding=10
+            )
+
+        text = ttk.ScrolledText(
+            widget,
+            bootstyle="round-secondary",
+            auto_hide=True,
+            font=("Cascadia Code", 11),
+            relief="flat",
+            borderwidth=0
+        )
+
+        text.pack(side="left", fill="x", expand=True)
+
+        if default_txt:
+            text.insert("1.0", default_txt)
+        else:
+            text.insert("1.0", "Enter your text here.")
+
+        var = text.get("1.0", "end-1c")
+        
+        return widget, var
 
     
 
