@@ -1,69 +1,87 @@
 <div align="center">
 
-#  Easy Prep
+# Easy Prep
 
- **A universal, intuitive data preparation solution built for workplace productivity.**
+**A high-productivity desktop suite for rapid data transformation, multi-sheet SQL analytics, and low-code Python automation.**
 
 [![Python Version](https://img.shields.io/badge/Python-3.9%2B-blue.svg)](https://www.python.org/)
 [![UI Framework](https://img.shields.io/badge/UI-ttkbootstrap-107C41.svg)](https://ttkbootstrap.readthedocs.io/)
-[![Data Engine](https://img.shields.io/badge/Data-Pandas-150458.svg)](https://pandas.pydata.org/)
-[![Status](https://img.shields.io/badge/Status-Work%20in%20Progress-orange.svg)]()
+[![Data Engine](https://img.shields.io/badge/Data-Pandas%20%7C%20DuckDB-150458.svg)](https://duckdb.org/)
+[![Plugins](https://img.shields.io/badge/Plugins-Dynamic%20GUI-brightgreen.svg)](#-dynamic-python-plugin-engine)
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 
 </div>
 
-**Easy Prep** is a lightweight desktop application designed to streamline repetitive data cleaning, transformation, and previewing tasks without requiring users to manually copy pasting on Excel or writing complex scripts.
+---
 
-Architected for modularity: seamlessly integrate your own custom Python functions and tailor the tool to your workplace needs.
+**Easy Prep** bridges the gap between manual Excel manipulations and full-scale data engineering. Designed for data analysts, business intelligence teams, and operational specialists, Easy Prep turns messy datasets into clean, report-ready tables using high-performance local processing, multi-file SQL joins, and automated GUI generation for custom script pipelines.
 
+---
 
-##  Interface Preview
+## ⚡ Key Highlights
+
+### 🔌 Dynamic Python Plugin Engine
+*Transform scripts into interactive desktop tools effortlessly.*
+- **Zero-Boilerplate GUI Generation:** Write standard Python data functions, and Easy Prep automatically generates corresponding UI controls (inputs, dropdowns, toggles) for end users.
+- **Extensible Architecture:** Package custom transformation logic, proprietary formulas, or company-specific cleaning rules into modular plugins.
+- **Low-Code Automation:** Allow non-technical team members to leverage custom Python logic without opening a terminal or modifying code.
+
+### 🦆 Embedded DuckDB SQL Engine
+*Perform complex multi-sheet relational queries locally.*
+- **Cross-Sheet & Multi-File Analytics:** Query across multiple loaded Excel worksheets, CSVs, or DataFrames using standard SQL syntax.
+- **High-Performance In-Memory Joins:** Cross-reference tables, execute aggregations, and blend datasets instantly powered by DuckDB.
+- **Native SQL Syntax Highlighting:** Built-in SQL editor with tokenization and key-bindings for rapid ad-hoc data exploration.
+
+---
+
+## 📸 Interface Preview
 
 <div align="center">
 
-### Main Page
-<img width="100%" alt="easy-prep Main Page" src="https://github.com/user-attachments/assets/8b66f8d1-e4fe-4dc2-a133-a4373821a769" />
+### Main Workspace
+<img width="100%" alt="Easy Prep Main Page" src="https://github.com/user-attachments/assets/8b66f8d1-e4fe-4dc2-a133-a4373821a769" />
 
 <br/><br/>
 
-### Dashboard
-<img width="100%" alt="easy-prep Dashboard" src="https://github.com/user-attachments/assets/537a6a7d-1330-47d2-9b19-1dedc96898d2" />
+### Data Profiling & Analytics Dashboard
+<img width="100%" alt="Easy Prep Dashboard" src="https://github.com/user-attachments/assets/537a6a7d-1330-47d2-9b19-1dedc96898d2" />
 
 </div>
 
+---
 
-##  Key Features
+## 🚀 Core Features
 
--  **Automated Data Preparation:** Clean missing values, standardize formatting, and prepare dataset pipelines quickly.
--  **Modern Desktop GUI:** Clean, responsive interface built with `ttkbootstrap` themes.
--  **High-Performance Core:** Powered by `Pandas` for fast in-memory tabular processing.
--  **Interactive Data Dashboard:** Instant dataset visualization, column profiling, and summary analytics.
--  **Workplace-Focused:** Designed to bridge the gap between raw data dumps and decision-ready analysis.
--  **Easy to Use:** Technical and non-technical users can easily pickup and manipulating data.
--  **Built for Scaling:** Easy to add functions add customize as needed.
+- **Automated Data Cleaning:** Standardize date formats, handle missing values, clean whitespace, and deduplicate records with instant UI controls.
+- **Modern Responsive UI:** Built with `ttkbootstrap` for a crisp visual interface with native dark/light theme support.
+- **Interactive Profiling:** Instant column distributions, data type detection, and summary statistics to catch data anomalies early.
+- **Local-First & Secure:** Processes data entirely in-memory on your local machine—ideal for confidential workplace files.
 
-   
-##  Built With
+---
+
+## 🛠️ Tech Stack
 
 <div align="center">
 
-| Component | Technology | Description |
+| Component | Technology | Role |
 | :--- | :--- | :--- |
-| **Language** | ![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white) | Core application logic |
-| **Interface** | ![ttkbootstrap](https://img.shields.io/badge/ttkbootstrap-107C41?style=flat) | Modern themed Tkinter wrapper |
-| **Data Engine** | ![Pandas](https://img.shields.io/badge/Pandas-150458?style=flat&logo=pandas&logoColor=white) | Fast tabular data manipulation |
+| **Core Runtime** | ![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white) | Application engine and execution runtime |
+| **Interface** | ![ttkbootstrap](https://img.shields.io/badge/ttkbootstrap-107C41?style=flat) | Modern desktop GUI component architecture |
+| **Data Engine** | ![Pandas](https://img.shields.io/badge/Pandas-150458?style=flat&logo=pandas&logoColor=white) | In-memory tabular manipulation and transformation |
+| **SQL Engine** | ![DuckDB](https://img.shields.io/badge/DuckDB-FFF000?style=flat&logo=duckdb&logoColor=black) | Fast multi-file relational querying and cross-referencing |
 
 </div>
 
-##  Getting Started
+---
+
+## 🏁 Getting Started
 
 ### Prerequisites
+- **Python 3.9+** installed on your system.
 
-Make sure you have **Python 3.9+** installed on your system.
-
-### Installation & Execution
+### Quick Start
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/LukeShawket/easy-prep.git
+   git clone [https://github.com/LukeShawket/easy-prep.git](https://github.com/LukeShawket/easy-prep.git)
    cd easy-prep
