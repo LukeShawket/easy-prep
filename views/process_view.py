@@ -1,6 +1,7 @@
 import ttkbootstrap as ttk
 import tkinter as tk
 from ttkbootstrap.constants import *
+from views.sql_editor_view import SQLEditor
 
 
 class ProcessView:
@@ -15,8 +16,9 @@ class ProcessView:
         self.field_var = {}
         self.check_btn_var = {}
         self.toolbar = None
+        self.sheet_name = None
 
-    def process_panel(self, frame, title, fields, scrl, cls, funcs):
+    def process_panel(self, frame, title, fields, scrl, cls, funcs, sheet_name):
 
 
         if frame:
@@ -27,6 +29,7 @@ class ProcessView:
 
         self.current_columns = cls
         self.input_schema = fields
+        self.sheet_name = sheet_name
 
         # Toolbar
         self.toolbar = ttk.Frame(frame)
@@ -85,7 +88,7 @@ class ProcessView:
                 field_id = field.get("id")
                 field_type = field.get("type")
                 parent_id = field.get("parent_id")
-                default_text = field.get("default_text")
+                default_text = field.get("default_text") + self.sheet_name
 
 
                 if not parent_id:
@@ -334,23 +337,23 @@ class ProcessView:
                 padding=10
             )
 
-        text = ttk.ScrolledText(
-            widget,
-            bootstyle="round-secondary",
-            auto_hide=True,
-            font=("Cascadia Code", 11),
-            relief="flat",
-            borderwidth=0
-        )
+        sql_editor = SQLEditor(
+                                master=widget,
+                                bootstyle="round-secondary",
+                                auto_hide=True,
+                                font=("Consolas", 11),
+                                relief="flat",
+                                borderwidth=0
+                            )
 
-        text.pack(side="left", fill="x", expand=True)
+        sql_editor.pack(side="left", fill="x", expand=True)
 
         if default_txt:
-            text.insert("1.0", default_txt)
+            sql_editor.insert("1.0", default_txt)
         else:
-            text.insert("1.0", "Enter your text here.")
+            sql_editor.insert("1.0", "Enter your text here.")
 
-        var = text.get("1.0", "end-1c")
+        var = sql_editor.get("1.0", "end-1c")
         
         return widget, var
 

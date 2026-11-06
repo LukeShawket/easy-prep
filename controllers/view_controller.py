@@ -164,7 +164,8 @@ class ContrllerView:
                     fields=self.current_app.input_items,
                     scrl = ScrollableFrame,
                     cls=self.work_space.current_columns,
-                    funcs=self.funcs
+                    funcs=self.funcs,
+                    sheet_name=self.work_space.current_sheet_name
                 )
 
         self.current_app.__init__()

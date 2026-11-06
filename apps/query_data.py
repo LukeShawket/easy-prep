@@ -14,7 +14,7 @@ class Predicter:
                                 "state": 1,
                                 "outer_frame_name": "Query Tool",
                                 "type": "entry_box",
-                                "default_text": "SELECT TOP 100 *\nFROM ~",
+                                "default_text": "SELECT TOP 100 *\nFROM ",
                                 "return": None
                             }
 
