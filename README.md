@@ -7,7 +7,6 @@
 [![Python Version](https://img.shields.io/badge/Python-3.9%2B-blue.svg)](https://www.python.org/)
 [![UI Framework](https://img.shields.io/badge/UI-ttkbootstrap-107C41.svg)](https://ttkbootstrap.readthedocs.io/)
 [![Data Engine](https://img.shields.io/badge/Data-Pandas%20%7C%20DuckDB-150458.svg)](https://duckdb.org/)
-[![Plugins](https://img.shields.io/badge/Plugins-Dynamic%20GUI-brightgreen.svg)](#-dynamic-python-plugin-engine)
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 
 </div>
