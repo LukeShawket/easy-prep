@@ -17,15 +17,15 @@
 
 ---
 
-## ⚡ Key Highlights
+## Key Highlights
 
-### 🔌 Dynamic Python Plugin Engine
+### Dynamic Python Plugin Engine
 *Transform scripts into interactive desktop tools effortlessly.*
 - **Zero-Boilerplate GUI Generation:** Write standard Python data functions, and Easy Prep automatically generates corresponding UI controls (inputs, dropdowns, toggles) for end users.
 - **Extensible Architecture:** Package custom transformation logic, proprietary formulas, or company-specific cleaning rules into modular plugins.
 - **Low-Code Automation:** Allow non-technical team members to leverage custom Python logic without opening a terminal or modifying code.
 
-### 🦆 Embedded DuckDB SQL Engine
+### Embedded DuckDB SQL Engine
 *Perform complex multi-sheet relational queries locally.*
 - **Cross-Sheet & Multi-File Analytics:** Query across multiple loaded Excel worksheets, CSVs, or DataFrames using standard SQL syntax.
 - **High-Performance In-Memory Joins:** Cross-reference tables, execute aggregations, and blend datasets instantly powered by DuckDB.
@@ -33,7 +33,7 @@
 
 ---
 
-## 📸 Interface Preview
+## Interface Preview
 
 <div align="center">
 
@@ -49,7 +49,7 @@
 
 ---
 
-## 🚀 Core Features
+## Core Features
 
 - **Automated Data Cleaning:** Standardize date formats, handle missing values, clean whitespace, and deduplicate records with instant UI controls.
 - **Modern Responsive UI:** Built with `ttkbootstrap` for a crisp visual interface with native dark/light theme support.
@@ -58,7 +58,7 @@
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 <div align="center">
 
@@ -73,7 +73,7 @@
 
 ---
 
-## 🏁 Getting Started
+## Getting Started
 
 ### Prerequisites
 - **Python 3.9+** installed on your system.
